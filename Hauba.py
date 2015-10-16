@@ -54,7 +54,8 @@ def record_secret():
     btn2_value = GPIO.input(BTN_2)
     while(not btn2_value):
         data = stream.read(RATE/CHUNK)
-        frames.append(data)
+        if data != '':
+            frames.append(data)
         btn2_value = GPIO.input(BTN_2)
     print("* done recording")
     stream.stop_stream()
@@ -86,14 +87,28 @@ def playSound(file,loop):
     data = wf.readframes(CHUNK)
     # PLAYBACK LOOP
     btn1_value = GPIO.input(BTN_1)
-    while  (not btn1_value):
-        btn1_value = GPIO.input(BTN_1)
-        stream.write(data)
+    btn3_value = GPIO.input(BTN_3)
+    donePlaying = False
+    while  (not donePlaying):
         data = wf.readframes(CHUNK)
-        if (data == '' and loop): # If file is over then rewind.
-            wf.rewind()
+        while (data != ''):
+            if (loop):
+                btn1_value = GPIO.input(BTN_1)
+                if (btn1_value):
+                    data = ''
+            else:            
+                btn3_value = GPIO.input(BTN_3)
+                if (btn3_value):
+                    data = ''
+            stream.write(data)
             data = wf.readframes(CHUNK)
+        if (btn1_value):
+            donePlaying = True
+        if (loop): # If file is over and loop is on then rewind.
+            wf.rewind()
             print ("Loop on")
+        else:
+            donePlaying = True
     # cleanup stuff.
     stream.close()    
     p.terminate()
