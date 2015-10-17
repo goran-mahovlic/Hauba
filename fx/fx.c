@@ -104,7 +104,7 @@ int main(int argc, char **argv){
   int          nframes;
 
 
-  float   sPitchFactor = 1, sEffect = 0, sOutputGain = 1.0;
+  float   sPitchFactor = 1, sOutputGain = 1.0;
   float   cEffect = 0;
 
   float   *gInFIFO, *gOutFIFO, *gOutputAccum;
@@ -127,7 +127,6 @@ int main(int argc, char **argv){
   sPitchFactor = (float)(atoi(argv[3]))/100.0;
   printf("pitch factor: %f\n", sPitchFactor);
   if(argv[4][0]=='1'){
-      sEffect=0.5;
       cEffect=1.0;
   }
 
@@ -247,7 +246,7 @@ int main(int argc, char **argv){
             gSynMagn[index] += gAnaMagn[k];
             gSynFreq[index] = gAnaFreq[k] * sPitchFactor;
             if(cEffect)
-              gSynFreq[index] = gSynFreq[index]*sEffect + sEffect*200*(float)rand()/RAND_MAX-100;
+              gSynFreq[index] = 0;
           }
         }
         phaseVocSynthesis(fftTmpC, gSumPhase, gSynMagn, gSynFreq, freqPerBin, expct);
