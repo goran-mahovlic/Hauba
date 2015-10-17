@@ -36,7 +36,7 @@ GPIO.output(LED_B, GPIO.LOW)
 # recording settings
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
-CHANNELS = 2
+CHANNELS = 1
 RATE = 44100
 RECORD_SECONDS = 5
 WAVE_OUTPUT_FILENAME = "secrets/secret_"
