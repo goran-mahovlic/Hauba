@@ -39,7 +39,7 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 RECORD_SECONDS = 5
-WAVE_OUTPUT_FILENAME = "secrets/secret_"
+WAVE_OUTPUT_FILENAME = "secret_"
 
 # recording file while button is pressed file will be placed in secrets folder
 def record_secret():
@@ -61,7 +61,7 @@ def record_secret():
     stream.stop_stream()
     stream.close()
     p.terminate()
-    wf = wave.open(WAVE_OUTPUT_FILENAME + time.strftime("%d%m%y%H%M%S", time.localtime()) + ".wav", 'wb')
+    wf = wave.open("/home/pi/Hauba/tmp/" +  WAVE_OUTPUT_FILENAME + time.strftime("%d%m%y%H%M%S", time.localtime()) + ".wav", 'wb')
     wf.setnchannels(CHANNELS)
     wf.setsampwidth(p.get_sample_size(FORMAT))
     wf.setframerate(RATE)
@@ -70,6 +70,30 @@ def record_secret():
     time.sleep(1)
 
 # Play file, once or in loop
+def playGuide(file):
+    # open the file for reading.
+    wf = wave.open(file, 'rb')
+    # create an audio object
+    p = pyaudio.PyAudio()
+    # open stream based on the wave object which has been input.
+    stream = p.open(format =
+                    p.get_format_from_width(wf.getsampwidth()),
+                    channels = wf.getnchannels(),
+                    rate = wf.getframerate(),
+                    output = True)
+
+    # read data (based on the chunk size)
+    data = wf.readframes(CHUNK)
+    # play stream (looping from beginning of file to the end)
+    while data != '':
+    # writing to the stream is what *actually* plays the sound.
+        stream.write(data)
+        data = wf.readframes(CHUNK)
+
+    # cleanup stuff.
+    stream.close()    
+    p.terminate()
+
 def playSound(file,loop):
     print ("Playing file: " + file)
     print loop
@@ -91,22 +115,21 @@ def playSound(file,loop):
     donePlaying = False
     while  (not donePlaying):
         data = wf.readframes(CHUNK)
-        while (data != ''):
+        while (data != '' and not donePlaying):
             if (loop):
                 btn1_value = GPIO.input(BTN_1)
-                if (btn1_value):
-                    data = ''
+                if (not btn1_value):
+                    donePlaying = True
             else:            
                 btn3_value = GPIO.input(BTN_3)
                 if (btn3_value):
-                    data = ''
+                    donePlaying = True
             stream.write(data)
             data = wf.readframes(CHUNK)
         if (btn1_value):
             donePlaying = True
         if (loop): # If file is over and loop is on then rewind.
             wf.rewind()
-            print ("Loop on")
         else:
             donePlaying = True
     # cleanup stuff.
@@ -120,8 +143,9 @@ while True:
         btn1_value = GPIO.input(BTN_1)
         btn2_value = GPIO.input(BTN_2)
         btn3_value = GPIO.input(BTN_3)
-        if (not btn1_value):
-            playSound("music/music.wav",True)
+        if (btn1_value):
+            playSound("music/EssereDonna.wav",True)
+            playGuide("guide/guide.wav")
         if (not btn2_value):
             record_secret()
         if (not btn3_value):
