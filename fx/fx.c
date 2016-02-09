@@ -104,7 +104,7 @@ int main(int argc, char **argv){
   int          nframes;
 
 
-  float   sPitchFactor = 1, sOutputGain = 1.0;
+  float   sPitchFactor = 1, sOutputGain = 6.0;
   float   cEffect = 0;
 
   float   *gInFIFO, *gOutFIFO, *gOutputAccum;
